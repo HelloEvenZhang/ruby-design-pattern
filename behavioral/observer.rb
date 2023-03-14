@@ -9,13 +9,13 @@
 # 4. 绝大部分观察者需要一些与事件相关的上下文数据，这些数据可作为update方法的参数来传递，当然，发布者也可以将自身传出去
 # 5. 客户端需要生成所需的全部观察者，并在相应的发布者处完成添加操作
 
-require 'observable'
+require 'observer'
 
 class Product
   include Observable
 
   def initialize
-    @state = "In Stock"
+    @state = 'In Stock'
   end
 
   def state
@@ -23,15 +23,19 @@ class Product
   end
 
   def out_of_stock
-    @state = "Out Of Stock"
+    return false if @state == 'Out Of Stock'
+
+    @state = 'Out Of Stock'
+    true
   end
   
   def in_stock
-    unless @state == "In Stock"
-      @state = "In Stock"
-      changed
-      notify_observers(@state)
-    end
+    return false if @state == 'In Stock'
+
+    @state = 'In Stock'
+    changed
+    notify_observers(@state)
+    true
   end
 end
 
@@ -41,22 +45,21 @@ class Customer
   end
 
   def update(state)
-    "Product already #{state}. #{@name} go shopping!"
+    puts "Send email to #{@name}: Product already #{state}."
   end
 end
 
 product = Product.new
-customer_a = Customer.new("Customer A")
-customer_b = Customer.new("Customer B")
-customer_c = Customer.new("Customer C")
+product.out_of_stock
+product.state
 
+customer_a = Customer.new('Customer A')
+customer_b = Customer.new('Customer B')
 product.add_observer(customer_a)
 product.add_observer(customer_b)
 
-product.state
-product.out_of_stock
 product.in_stock
 
-
-
-
+# Out Of Stock
+# Send email to Customer A: Product already In Stock.
+# Send email to Customer B: Product already In Stock.
