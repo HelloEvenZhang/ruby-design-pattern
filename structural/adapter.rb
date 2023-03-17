@@ -11,7 +11,7 @@ class Encryper
 
   def encrypt(reader, writer)
     key_index = 0
-    while not reader.eof?
+    until reader.eof?
       clear_char = reader.getc
       encrypted_char = clear_char ^ @key[key_index]
       writer.putc(encrypted_char)
@@ -27,16 +27,14 @@ class StringIOAdapter
   end
 
   def getc
-    if @position >= @string.length
-      raise EOFError
-    end
-    ch = @string[@position]
+    raise EOFError if @position >= @string.length
+
     @position += 1
-    return ch
+    @string[@position]
   end
 
   def eof?
-    return @position >= @string.length
+    @position >= @string.length
   end
 end
 
